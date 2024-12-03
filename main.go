@@ -1,10 +1,11 @@
 package main
 
 import (
-	second "adventofcode/2024-go/2"
+	third "adventofcode/2024-go/3"
 )
 
 func main() {
 	// first.Run()
-	second.Run()
+	// second.Run()
+	third.Run()
 }

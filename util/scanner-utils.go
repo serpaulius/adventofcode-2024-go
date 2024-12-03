@@ -36,3 +36,11 @@ func ReadNumberLines(scanner *bufio.Scanner) [][]T {
 	}
 	return columns
 }
+
+func ReadLines(scanner *bufio.Scanner) []string {
+	lines := make([]string, 0)
+	for scanner.Scan() {
+		lines = append(lines, scanner.Text())
+	}
+	return lines
+}
