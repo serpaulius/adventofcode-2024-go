@@ -50,5 +50,5 @@ func Run() {
 	fmt.Println("1.1 - sum of diffs", sum)
 
 	similarityIndex := similarityScore(col1, col2)
-	fmt.Println("2.2 - similarity score", similarityIndex)
+	fmt.Println("1.2 - similarity score", similarityIndex)
 }

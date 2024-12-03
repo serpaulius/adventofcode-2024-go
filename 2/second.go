@@ -3,6 +3,7 @@ package second
 import (
 	"adventofcode/2024-go/util"
 	"fmt"
+	"log"
 )
 
 func checkRow(row []int64) bool {
@@ -26,13 +27,13 @@ func checkRow(row []int64) bool {
 }
 
 func recheckRowWithDampener(row []int64) bool {
-	// fmt.Println("! ", row)
+	log.Println("using dampener for ", row)
 	for i := range row {
 		// fixme: slicing is ugly here
 		sliced := []int64{}
 		sliced = append(sliced, row[:i]...)
 		sliced = append(sliced, row[i+1:]...)
-		// fmt.Println(i, sliced)
+		log.Println(i, sliced)
 		if checkRow(sliced) {
 			return true
 		}
@@ -62,8 +63,8 @@ func Run() {
 	lines := util.ReadNumberLines(scanner)
 
 	safeCount := safetyCheck(lines, false)
-	fmt.Println(safeCount)
+	fmt.Println("2.1 - safety check", safeCount)
 
 	problemDampenerSafeCount := safetyCheck(lines, true)
-	fmt.Println(problemDampenerSafeCount)
+	fmt.Println("2.2 - safety with dampener", problemDampenerSafeCount)
 }

@@ -3,6 +3,7 @@ package third
 import (
 	"adventofcode/2024-go/util"
 	"fmt"
+	"log"
 	"regexp"
 	"strconv"
 	"strings"
@@ -32,7 +33,7 @@ func sumMuls(mulMatches []string) int64 {
 	for _, mulMatch := range mulMatches {
 		num1, num2 := parseMul(mulMatch)
 		multiplied := num1 * num2
-		// fmt.Println(num1, num2, multiplied)
+		log.Println(num1, num2, multiplied)
 		sum += multiplied
 	}
 	return sum
@@ -68,8 +69,8 @@ func Run() {
 	lines := util.ReadLines(scanner)
 
 	mulSum := mulcheck(lines)
-	fmt.Println(mulSum)
+	fmt.Println("3.1 - sum of muls", mulSum)
 
 	mulSumNoDonts := mulcheckNoDonts(lines)
-	fmt.Println(mulSumNoDonts)
+	fmt.Println("3.2 - sum of muls without don'ts", mulSumNoDonts)
 }
