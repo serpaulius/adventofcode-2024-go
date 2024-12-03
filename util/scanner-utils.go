@@ -22,3 +22,17 @@ func ReadNumberColumns(scanner *bufio.Scanner) ([]T, []T) {
 
 	return col1, col2
 }
+
+func ReadNumberLines(scanner *bufio.Scanner) [][]T {
+	columns := make([][]T, 0)
+	for scanner.Scan() {
+		fields := strings.Fields(scanner.Text())
+		row := make([]T, 0)
+		for _, val := range fields {
+			parsed, _ := strconv.ParseInt(val, 10, 64)
+			row = append(row, parsed)
+		}
+		columns = append(columns, row)
+	}
+	return columns
+}

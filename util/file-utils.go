@@ -6,7 +6,7 @@ import (
 )
 
 func OpenFileOrPanicPlz(path string) *os.File {
-	file, err := os.Open("./1/input.txt")
+	file, err := os.Open(path)
 	if err != nil {
 		panic(err)
 	}
