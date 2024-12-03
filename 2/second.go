@@ -22,14 +22,31 @@ func checkRow(row []int64) bool {
 			return false
 		}
 	}
-	fmt.Println(row)
 	return true
 }
 
-func safetyCheck(rows [][]int64) int {
+func recheckRowWithDampener(row []int64) bool {
+	// fmt.Println("! ", row)
+	for i := range row {
+		// fixme: slicing is ugly here
+		sliced := []int64{}
+		sliced = append(sliced, row[:i]...)
+		sliced = append(sliced, row[i+1:]...)
+		// fmt.Println(i, sliced)
+		if checkRow(sliced) {
+			return true
+		}
+	}
+	return false
+}
+
+func safetyCheck(rows [][]int64, tolerateOne bool) int {
 	safeCount := 0
 	for _, row := range rows {
 		isValid := checkRow(row)
+		if tolerateOne && !isValid {
+			isValid = recheckRowWithDampener(row)
+		}
 
 		if isValid {
 			safeCount += 1
@@ -44,9 +61,9 @@ func Run() {
 	scanner := util.GiveMeAScannerPlz(file)
 	lines := util.ReadNumberLines(scanner)
 
-	safeCount := safetyCheck(lines)
+	safeCount := safetyCheck(lines, false)
 	fmt.Println(safeCount)
 
-	problemDampenerSafeCount := safetyCheck(lines)
+	problemDampenerSafeCount := safetyCheck(lines, true)
 	fmt.Println(problemDampenerSafeCount)
 }
