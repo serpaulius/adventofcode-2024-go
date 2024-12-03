@@ -17,25 +17,48 @@ func parseMul(str string) (int64, int64) {
 	return number1, number2
 }
 
-func mulcheck(lines []string) int64 {
-	muls := make([]int64, 0)
-	r, _ := regexp.Compile(`mul\([0-9]{1,3},[0-9]{1,3}\)`)
+func matchAllLines(expression string, lines []string) []string {
+	r, _ := regexp.Compile(expression)
+
+	var matches []string
 	for _, line := range lines {
-		mulMatches := r.FindAllString(line, -1)
-
-		fmt.Println(mulMatches)
-
-		for _, mulMatch := range mulMatches {
-			num1, num2 := parseMul(mulMatch)
-			muls = append(muls, num1*num2)
-			fmt.Println(num1, num2, muls)
-		}
+		matches = append(matches, r.FindAllString(line, -1)...)
 	}
+	return matches
+}
+
+func sumMuls(mulMatches []string) int64 {
 	var sum int64
-	for _, mul := range muls {
-		sum += mul
+	for _, mulMatch := range mulMatches {
+		num1, num2 := parseMul(mulMatch)
+		multiplied := num1 * num2
+		// fmt.Println(num1, num2, multiplied)
+		sum += multiplied
 	}
 	return sum
+}
+
+func mulcheck(lines []string) int64 {
+	mulMatches := matchAllLines(`mul\([0-9]{1,3},[0-9]{1,3}\)`, lines)
+	return sumMuls(mulMatches)
+}
+
+func mulcheckNoDonts(lines []string) int64 {
+	matches := matchAllLines(`mul\([0-9]{1,3},[0-9]{1,3}\)|do\(\)|don't\(\)`, lines)
+	var noDonts []string
+	ignoreMode := false
+	for _, match := range matches {
+		if strings.Compare(match, "do()") == 0 {
+			ignoreMode = false
+		}
+		if strings.Compare(match, "don't()") == 0 {
+			ignoreMode = true
+		}
+		if !ignoreMode && strings.HasPrefix(match, "mul") {
+			noDonts = append(noDonts, match)
+		}
+	}
+	return sumMuls(noDonts)
 }
 
 func Run() {
@@ -44,6 +67,9 @@ func Run() {
 	scanner := util.GiveMeAScannerPlz(file)
 	lines := util.ReadLines(scanner)
 
-	safeCount := mulcheck(lines)
-	fmt.Println(safeCount)
+	mulSum := mulcheck(lines)
+	fmt.Println(mulSum)
+
+	mulSumNoDonts := mulcheckNoDonts(lines)
+	fmt.Println(mulSumNoDonts)
 }
