@@ -4,3 +4,4 @@
 2.2 - safety with dampener 658
 3.1 - sum of muls 185797128
 3.2 - sum of muls without don'ts 89798695
+4.1 - XMAS count 2336
