@@ -36,6 +36,14 @@ func (g Grid) getLetterByCoordinate(c Coordinate) string {
 	return string(g.lines[c.y][c.x])
 }
 
+func (g Grid) isEdge(c Coordinate) bool {
+	return c.x == 0 || c.y == 0 || c.x == g.width-1 || c.y == g.height-1
+}
+
+func (g Grid) isValidCoord(c Coordinate) bool {
+	return c.x >= 0 && c.y >= 0 && c.x < g.width && c.y < g.height
+}
+
 func (g Grid) findAll(letter string) []Coordinate {
 	var occurences []Coordinate
 	c := Coordinate{}
@@ -56,7 +64,7 @@ func (g Grid) countWordsForCoordinate(word string, position Coordinate) int {
 		candidate := ""
 		c := position
 		for i := 0; i < wordLength; i++ {
-			if c.x >= 0 && c.y >= 0 && c.x < g.width && c.y < g.height {
+			if g.isValidCoord(c) {
 				candidate += g.getLetterByCoordinate(c)
 			}
 			c = c.add(vect)
@@ -80,36 +88,30 @@ func (g Grid) countWordsForCoordinate(word string, position Coordinate) int {
 // M.S  S.M
 // .A.  .A.
 // S.M  M.S
-
-func (g Grid) isEdge(c Coordinate) bool {
-	return c.x < 1 || c.y < 1 || c.x >= g.width-1 || c.y >= g.height-1
-}
-
 func ugliestCrossMASCheck(lines []string) int {
 	grid := NewGrid(lines)
-	foundLetters := grid.findAll("A")
+	aCoordinates := grid.findAll("A")
 
 	xMasCount := 0
-	for _, letter := range foundLetters {
-		if grid.isEdge(letter) {
-			continue
-		}
-		var cornerPositions []Coordinate
-		for _, cornerVector := range cornerVectors {
-			cornerPositions = append(cornerPositions, letter.add(cornerVector))
-		}
+	for _, aCoord := range aCoordinates {
+		if !grid.isEdge(aCoord) {
+			var cornerPositions []Coordinate
+			for _, cornerVector := range cornerVectors {
+				cornerPositions = append(cornerPositions, aCoord.add(cornerVector))
+			}
 
-		exactlyTwo := 0
-		for i, corner := range cornerPositions {
-			oppositeIndex := (i + 2) % 4
-			if strings.Compare(grid.getLetterByCoordinate(corner), "M") == 0 {
-				if strings.Compare(grid.getLetterByCoordinate(cornerPositions[oppositeIndex]), "S") == 0 {
+			exactlyTwo := 0
+			for i, corner := range cornerPositions {
+				value := grid.getLetterByCoordinate(corner)
+				oppositeIndex := (i + 2) % 4
+				oppositeValue := grid.getLetterByCoordinate(cornerPositions[oppositeIndex])
+				if strings.Compare(value, "M") == 0 && strings.Compare(oppositeValue, "S") == 0 {
 					exactlyTwo += 1
 				}
 			}
-		}
-		if exactlyTwo == 2 {
-			xMasCount += 1
+			if exactlyTwo == 2 {
+				xMasCount += 1
+			}
 		}
 	}
 
