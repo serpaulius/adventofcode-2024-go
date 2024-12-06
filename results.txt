@@ -6,3 +6,4 @@
 3.2 - sum of muls without don'ts 89798695
 4.1 - XMAS count 2336
 4.2 - X-MAS count 1831
+5.1 - pages and rules 5762
