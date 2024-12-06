@@ -3,80 +3,105 @@ package fifth
 import (
 	"adventofcode/2024-go/util"
 	"fmt"
-	"log"
 	"slices"
 	"strconv"
 	"strings"
 )
 
-type RuleMap map[int64][]int64
+type RuleMap map[string][]string
 
-func parseRule(line string) (int64, int64) {
-	pages := strings.Split(line, "|")
-	page1, _ := strconv.ParseInt(pages[0], 10, 64)
-	page2, _ := strconv.ParseInt(pages[1], 10, 64)
-	return page1, page2
+type PageList []string
 
+type ViolatedRule struct {
+	page           string
+	shouldBeBefore string
+}
+
+type FilteredUpdates struct {
+	valid   []PageList
+	invalid []PageList
 }
 
 func parseRules(lines []string) RuleMap {
 	var rules = RuleMap{}
 	for _, line := range lines {
 		if strings.Contains(line, "|") {
-			page, before := parseRule(line)
-			rules[page] = append(rules[page], before)
+			rule := strings.Split(line, "|")
+			page, shouldBeBefore := rule[0], rule[1]
+			rules[page] = append(rules[page], shouldBeBefore)
 		}
 	}
 	return rules
 }
 
-type Update struct {
-	pages []int64
-}
-
-func parseUpdates(lines []string) []Update {
-	var rules = []Update{}
+func parseUpdates(lines []string) []PageList {
+	var pageLists []PageList
 	for _, line := range lines {
 		if strings.Contains(line, ",") {
-			updates := strings.Split(line, ",")
-			var numbers = []int64{}
-			for _, update := range updates {
-				number, _ := strconv.ParseInt(update, 10, 64)
-				numbers = append(numbers, number)
-			}
-			rules = append(rules, Update{numbers})
+			list := strings.Split(line, ",")
+			pageLists = append(pageLists, list)
 		}
 	}
-	return rules
+	return pageLists
 }
 
-func validateUpdate(update Update, rules RuleMap) (int64, error) {
-	for i, currentPage := range update.pages {
-		prevPages := update.pages[:i]
+// todo: not the nicest
+func validateList(update PageList, rules RuleMap) (*ViolatedRule, error) {
+	for i, currentPage := range update {
+		prevPages := update[:i]
 		for _, previousPage := range prevPages {
 			ruleViolated := slices.Contains(rules[currentPage], previousPage)
 			if ruleViolated {
-				return 0, fmt.Errorf("update %v violated one of rules %v at %v", update, rules[currentPage], currentPage)
+				return &ViolatedRule{currentPage, previousPage}, fmt.Errorf("update %v violated one of rules %v at %v", update, rules[currentPage], currentPage)
 			}
 		}
 	}
-	return update.pages[(len(update.pages)-1)/2], nil
+	return nil, nil
 }
 
-func checkUpdates(lines []string) int64 {
-	rules := parseRules(lines)
-	updates := parseUpdates(lines)
-	log.Println(rules, updates)
+func filterValidUpdates(rules RuleMap, pageUpdates []PageList) FilteredUpdates {
+	var results = FilteredUpdates{}
+	for _, list := range pageUpdates {
+		_, err := validateList(list, rules)
 
-	var sumOfUpdateMidValues int64
-	for _, update := range updates {
-		result, err := validateUpdate(update, rules)
-		log.Println(update, result, err)
 		if err == nil {
-			sumOfUpdateMidValues += result
+			results.valid = append(results.valid, list)
+		}
+		if err != nil {
+			results.invalid = append(results.invalid, list)
 		}
 	}
-	return sumOfUpdateMidValues
+	return results
+}
+
+func sumOfMiddleValues(validPageUpdates []PageList) int64 {
+	var sumOfValidMidValues int64
+	for _, list := range validPageUpdates {
+		middleItem := list[(len(list)-1)/2]
+		num, _ := strconv.ParseInt(middleItem, 10, 64)
+		sumOfValidMidValues += num
+	}
+	return sumOfValidMidValues
+}
+
+// fixme: todo: pass values vs ref for everything?
+func fixViolation(list PageList, violation *ViolatedRule) PageList {
+	moveBeforeIndex := slices.Index(list, violation.shouldBeBefore)
+	indexToDelete := slices.Index(list, violation.page)
+	list = slices.Delete(list, indexToDelete, indexToDelete+1)
+	list = slices.Insert(list, moveBeforeIndex, violation.page)
+	return list
+}
+
+func fixInvalidUpdates(rules RuleMap, updates []PageList) []PageList {
+	for _, list := range updates {
+		violation, err := validateList(list, rules)
+		for err != nil {
+			list = fixViolation(list, violation)
+			violation, err = validateList(list, rules)
+		}
+	}
+	return updates
 }
 
 func Run() {
@@ -85,7 +110,14 @@ func Run() {
 	scanner := util.GiveMeAScannerPlz(file)
 	lines := util.ReadLines(scanner)
 
-	result := checkUpdates(lines)
-	fmt.Println("5.1 - pages and rules", result)
+	rules := parseRules(lines)
+	pageUpdates := parseUpdates(lines)
+	filteredUpdates := filterValidUpdates(rules, pageUpdates)
+
+	result1 := sumOfMiddleValues(filteredUpdates.valid)
+	fmt.Println("5.1 - pages and rules", result1)
+	fixed := fixInvalidUpdates(rules, filteredUpdates.invalid)
+	result2 := sumOfMiddleValues(fixed)
+	fmt.Println("5.2 - fixed pages and rules", result2)
 
 }
