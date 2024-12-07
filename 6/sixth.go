@@ -22,8 +22,7 @@ func prepareGuard(g *grid.Grid) Guard {
 
 func rotateVectorClockwise(c grid.Coordinate) grid.Coordinate {
 	for i, side := range grid.SideVectors {
-		// fixme: compare easier?
-		if side.X == c.X && side.Y == c.Y {
+		if c == side {
 			nextIndex := (i + 1) % 4
 			return grid.SideVectors[nextIndex]
 		}
@@ -39,21 +38,16 @@ func moveGuardOut(lines []string) int {
 
 	visitedCoordinates := map[grid.Coordinate]int64{guard.position: 1}
 
-	// while guard is not out of bounds
-	for g.IsValidCoord(guard.position) {
-		// check next coordinate
+	for {
 		nextStep := guard.position.Add(guard.direction)
-		isValid := g.IsValidCoord(nextStep)
-		if !isValid {
+		if !g.IsValidCoord(nextStep) {
 			break
 		}
 
 		isObstruction := g.GetLetterByCoordinate(nextStep) == "#"
-		// if obstruction change direction
 		if isObstruction {
 			guard.direction = rotateVectorClockwise(guard.direction)
 		}
-		// if not obstruction, move
 		if !isObstruction {
 			guard.position = nextStep
 			visitedCoordinates[guard.position]++
