@@ -1,7 +1,5 @@
 package grid
 
-import "strings"
-
 type Coordinate struct {
 	X int
 	Y int
@@ -40,7 +38,7 @@ func GridFromLines(lines []string) *Grid {
 }
 
 func (g Grid) GetLetterByCoordinate(c Coordinate) string {
-	return string(g.values[c.X][c.Y])
+	return g.values[c.X][c.Y]
 }
 
 func (g Grid) SetLetterByCoordinate(c Coordinate, letter string) {
@@ -60,7 +58,7 @@ func (g Grid) FindAll(letter string) []Coordinate {
 	c := Coordinate{}
 	for c.Y = range g.Height {
 		for c.X = range g.Width {
-			if strings.Compare(g.GetLetterByCoordinate(c), letter) == 0 {
+			if g.GetLetterByCoordinate(c) == letter {
 				occurences = append(occurences, c)
 			}
 		}

@@ -29,33 +29,49 @@ func rotateVectorClockwise(c grid.Coordinate) grid.Coordinate {
 	panic("no side matched, check vector")
 }
 
-func moveGuardOut(g *grid.Grid) (int, error) {
-	guard := prepareGuard(g)
-	visitedCoordinates := map[grid.Coordinate]int64{guard.position: 1}
-	obstaclesHit := map[grid.Coordinate]int64{}
+type arr2d [][]int64
 
+var visitedCoordinates arr2d
+var obstaclesHit arr2d
+
+func moveGuardOut(g *grid.Grid) (int, bool) {
+	guard := prepareGuard(g)
+
+	visitedCoordinates = make(arr2d, g.Width)
+	obstaclesHit = make(arr2d, g.Width)
+	for i := 0; i < g.Width; i++ {
+		visitedCoordinates[i] = make([]int64, g.Height)
+		obstaclesHit[i] = make([]int64, g.Height)
+	}
+	visitedCoordinates[guard.position.X][guard.position.Y] = 1
+	visitedSum := 1
+
+	var nextStep grid.Coordinate
 	for {
-		nextStep := guard.position.Add(guard.direction)
+		nextStep = guard.position.Add(guard.direction)
 		if !g.IsValidCoord(nextStep) {
 			break
 		}
 
-		isLoop := obstaclesHit[nextStep] > 1
-		if isLoop {
-			return 0, fmt.Errorf("guard is stuck")
+		if obstaclesHit[nextStep.X][nextStep.Y] > 1 {
+			return 0, false
 		}
 
 		isObstruction := g.GetLetterByCoordinate(nextStep) == "#"
 		if isObstruction {
-			obstaclesHit[nextStep]++
+			obstaclesHit[nextStep.X][nextStep.Y]++
 			guard.direction = rotateVectorClockwise(guard.direction)
 		}
 		if !isObstruction {
 			guard.position = nextStep
-			visitedCoordinates[guard.position]++
+			// count first times separately
+			if visitedCoordinates[guard.position.X][guard.position.Y] == 0 {
+				visitedSum++
+			}
+			visitedCoordinates[guard.position.X][guard.position.Y]++
 		}
 	}
-	return len(visitedCoordinates), nil
+	return visitedSum, true
 }
 
 func findPositionsForLoopObstacle(g *grid.Grid) int {
@@ -67,7 +83,7 @@ func findPositionsForLoopObstacle(g *grid.Grid) int {
 			if object == "." {
 				g.SetLetterByCoordinate(coord, "#")
 				_, err := moveGuardOut(g)
-				if err != nil {
+				if !err {
 					loopPositions++
 				}
 				g.SetLetterByCoordinate(coord, ".")
