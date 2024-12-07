@@ -13,22 +13,38 @@ func (v1 Coordinate) Add(v2 Coordinate) Coordinate {
 
 // x goes right, y goes bottom, listing vectors to corners from top-left clockwise:
 var CornerVectors = []Coordinate{{-1, -1}, {1, -1}, {1, 1}, {-1, 1}}
-var Vectors []Coordinate = append([]Coordinate{{1, 0}, {-1, 0}, {0, 1}, {0, -1}}, CornerVectors...)
+
+// ... listing vectors to sides from top clockwise
+var SideVectors = []Coordinate{{0, -1}, {1, 0}, {0, 1}, {-1, 0}}
+
+var Vectors []Coordinate = append(SideVectors, CornerVectors...)
 
 type Grid struct {
-	Lines         []string
+	values        [][]string
 	Width, Height int
 }
 
-func NewGrid(lines []string) *Grid {
-	grid := &Grid{Lines: lines}
+func GridFromLines(lines []string) *Grid {
+	width, height := len(lines[0]), len(lines)
+	var values [][]string
+	for x := 0; x < width; x++ {
+		values = append(values, make([]string, height))
+		for y := 0; y < height; y++ {
+			values[x][y] = string(lines[y][x])
+		}
+	}
+	grid := &Grid{values: values}
 	grid.Width = len(lines[0])
 	grid.Height = len(lines)
 	return grid
 }
 
 func (g Grid) GetLetterByCoordinate(c Coordinate) string {
-	return string(g.Lines[c.Y][c.X])
+	return string(g.values[c.X][c.Y])
+}
+
+func (g Grid) SetLetterByCoordinate(c Coordinate, letter string) {
+	g.values[c.X][c.Y] = letter
 }
 
 func (g Grid) IsEdge(c Coordinate) bool {

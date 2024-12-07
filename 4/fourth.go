@@ -40,7 +40,7 @@ func countWordsForCoordinate(g *grid.Grid, word string, position grid.Coordinate
 // .A.  .A.
 // S.M  M.S
 func ugliestCrossMASCheck(lines []string) int {
-	g := grid.NewGrid(lines)
+	g := grid.GridFromLines(lines)
 	aCoordinates := g.FindAll("A")
 
 	xMasCount := 0
@@ -70,7 +70,7 @@ func ugliestCrossMASCheck(lines []string) int {
 }
 
 func countWordsInLines(word string, lines []string) int {
-	g := grid.NewGrid(lines)
+	g := grid.GridFromLines(lines)
 	count := 0
 	for x := 0; x < g.Width; x++ {
 		for y := 0; y < g.Height; y++ {
