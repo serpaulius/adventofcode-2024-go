@@ -6,6 +6,7 @@ import (
 	third "adventofcode/2024-go/3"
 	fourth "adventofcode/2024-go/4"
 	fifth "adventofcode/2024-go/5"
+	sixth "adventofcode/2024-go/6"
 	"io"
 	"log"
 )
@@ -20,4 +21,5 @@ func main() {
 	third.Run()
 	fourth.Run()
 	fifth.Run()
+	sixth.Run()
 }

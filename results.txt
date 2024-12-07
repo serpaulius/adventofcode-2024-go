@@ -8,3 +8,4 @@
 4.2 - X-MAS count 1831
 5.1 - pages and rules 5762
 5.2 - fixed pages and rules 4130
+6.1 - pages and rules 0
