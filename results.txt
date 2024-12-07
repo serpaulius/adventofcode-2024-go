@@ -10,3 +10,4 @@
 5.2 - fixed pages and rules 4130
 6.1 - guard positions visited 5101
 6.2 - obstacles for looping a guard 1951
+7.1 - operators on the bridge 3119088655389
