@@ -4,7 +4,6 @@ import (
 	"adventofcode/2024-go/grid"
 	"adventofcode/2024-go/util"
 	"fmt"
-	"log"
 )
 
 type Guard struct {
@@ -30,13 +29,10 @@ func rotateVectorClockwise(c grid.Coordinate) grid.Coordinate {
 	panic("no side matched, check vector")
 }
 
-func moveGuardOut(lines []string) int {
-	g := grid.GridFromLines(lines)
+func moveGuardOut(g *grid.Grid) (int, error) {
 	guard := prepareGuard(g)
-
-	g.SetLetterByCoordinate(guard.position, ".")
-
 	visitedCoordinates := map[grid.Coordinate]int64{guard.position: 1}
+	obstaclesHit := map[grid.Coordinate]int64{}
 
 	for {
 		nextStep := guard.position.Add(guard.direction)
@@ -44,8 +40,14 @@ func moveGuardOut(lines []string) int {
 			break
 		}
 
+		isLoop := obstaclesHit[nextStep] > 1
+		if isLoop {
+			return 0, fmt.Errorf("guard is stuck")
+		}
+
 		isObstruction := g.GetLetterByCoordinate(nextStep) == "#"
 		if isObstruction {
+			obstaclesHit[nextStep]++
 			guard.direction = rotateVectorClockwise(guard.direction)
 		}
 		if !isObstruction {
@@ -53,9 +55,26 @@ func moveGuardOut(lines []string) int {
 			visitedCoordinates[guard.position]++
 		}
 	}
+	return len(visitedCoordinates), nil
+}
 
-	log.Println(len(visitedCoordinates), visitedCoordinates)
-	return len(visitedCoordinates)
+func findPositionsForLoopObstacle(g *grid.Grid) int {
+	loopPositions := 0
+	for x := 0; x < g.Width; x++ {
+		for y := 0; y < g.Height; y++ {
+			coord := grid.Coordinate{X: x, Y: y}
+			object := g.GetLetterByCoordinate(coord)
+			if object == "." {
+				g.SetLetterByCoordinate(coord, "#")
+				_, err := moveGuardOut(g)
+				if err != nil {
+					loopPositions++
+				}
+				g.SetLetterByCoordinate(coord, ".")
+			}
+		}
+	}
+	return loopPositions
 }
 
 func Run() {
@@ -64,7 +83,11 @@ func Run() {
 	scanner := util.GiveMeAScannerPlz(file)
 	lines := util.ReadLines(scanner)
 
-	positionsVisited := moveGuardOut(lines)
-	fmt.Println("6.1 - pages and rules", positionsVisited)
+	g := grid.GridFromLines(lines)
+	positionsVisited, _ := moveGuardOut(g)
+	fmt.Println("6.1 - guard positions visited", positionsVisited)
 
+	// todo: very inefficient, optimize
+	loopPositions := findPositionsForLoopObstacle(g)
+	fmt.Println("6.2 - obstacles for looping a guard", loopPositions)
 }
