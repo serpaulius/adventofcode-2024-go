@@ -7,16 +7,17 @@ import (
 )
 
 type Guard struct {
-	position  grid.Coordinate
-	direction grid.Coordinate
+	position         grid.Coordinate
+	direction        grid.Coordinate
+	startingPosition grid.Coordinate
 }
 
-func prepareGuard(g *grid.Grid) Guard {
+func findGuard(g *grid.Grid) *Guard {
 	guardPosition := g.FindAll("^")
 	if len(guardPosition) != 1 {
 		panic(fmt.Errorf("should be a single guard, instead there are %v", guardPosition))
 	}
-	return Guard{position: guardPosition[0], direction: grid.SideVectors[0]}
+	return &Guard{startingPosition: guardPosition[0], position: guardPosition[0], direction: grid.SideVectors[0]}
 }
 
 func rotateVectorClockwise(c grid.Coordinate) grid.Coordinate {
@@ -34,8 +35,8 @@ type arr2d [][]int64
 var visitedCoordinates arr2d
 var obstaclesHit arr2d
 
-func moveGuardOut(g *grid.Grid) (int, bool) {
-	guard := prepareGuard(g)
+func moveGuardOut(g *grid.Grid, guard *Guard) (int, bool) {
+	guard.position = guard.startingPosition
 
 	visitedCoordinates = make(arr2d, g.Width)
 	obstaclesHit = make(arr2d, g.Width)
@@ -74,7 +75,9 @@ func moveGuardOut(g *grid.Grid) (int, bool) {
 	return visitedSum, true
 }
 
-func findPositionsForLoopObstacle(g *grid.Grid) int {
+func findPositionsForLoopObstacle(g *grid.Grid, guard *Guard) int {
+	guard.position = guard.startingPosition
+
 	loopPositions := 0
 	for x := 0; x < g.Width; x++ {
 		for y := 0; y < g.Height; y++ {
@@ -82,7 +85,7 @@ func findPositionsForLoopObstacle(g *grid.Grid) int {
 			object := g.GetLetterByCoordinate(coord)
 			if object == "." {
 				g.SetLetterByCoordinate(coord, "#")
-				_, err := moveGuardOut(g)
+				_, err := moveGuardOut(g, guard)
 				if !err {
 					loopPositions++
 				}
@@ -100,10 +103,10 @@ func Run() {
 	lines := util.ReadLines(scanner)
 
 	g := grid.GridFromLines(lines)
-	positionsVisited, _ := moveGuardOut(g)
+	guard := findGuard(g)
+	positionsVisited, _ := moveGuardOut(g, guard)
 	fmt.Println("6.1 - guard positions visited", positionsVisited)
 
-	// todo: very inefficient, optimize
-	loopPositions := findPositionsForLoopObstacle(g)
+	loopPositions := findPositionsForLoopObstacle(g, guard)
 	fmt.Println("6.2 - obstacles for looping a guard", loopPositions)
 }
