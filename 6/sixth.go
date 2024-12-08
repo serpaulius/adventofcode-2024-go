@@ -7,9 +7,8 @@ import (
 )
 
 type Guard struct {
-	position         grid.Coordinate
-	direction        grid.Coordinate
-	startingPosition grid.Coordinate
+	position  grid.Coordinate
+	direction grid.Coordinate
 }
 
 func findGuard(g *grid.Grid) *Guard {
@@ -17,7 +16,7 @@ func findGuard(g *grid.Grid) *Guard {
 	if len(guardPosition) != 1 {
 		panic(fmt.Errorf("should be a single guard, instead there are %v", guardPosition))
 	}
-	return &Guard{startingPosition: guardPosition[0], position: guardPosition[0], direction: grid.SideVectors[0]}
+	return &Guard{position: guardPosition[0], direction: grid.SideVectors[0]}
 }
 
 func rotateVectorClockwise(c grid.Coordinate) grid.Coordinate {
@@ -35,9 +34,7 @@ type arr2d [][]int64
 var visitedCoordinates arr2d
 var obstaclesHit arr2d
 
-func moveGuardOut(g *grid.Grid, guard *Guard) (int, bool) {
-	guard.position = guard.startingPosition
-
+func moveGuardOut(g *grid.Grid, guard Guard) (int, bool) {
 	visitedCoordinates = make(arr2d, g.Width)
 	obstaclesHit = make(arr2d, g.Width)
 	for i := 0; i < g.Width; i++ {
@@ -75,9 +72,7 @@ func moveGuardOut(g *grid.Grid, guard *Guard) (int, bool) {
 	return visitedSum, true
 }
 
-func findPositionsForLoopObstacle(g *grid.Grid, guard *Guard) int {
-	guard.position = guard.startingPosition
-
+func findPositionsForLoopObstacle(g *grid.Grid, guard Guard) int {
 	loopPositions := 0
 	for x := 0; x < g.Width; x++ {
 		for y := 0; y < g.Height; y++ {
@@ -104,9 +99,9 @@ func Run() {
 
 	g := grid.GridFromLines(lines)
 	guard := findGuard(g)
-	positionsVisited, _ := moveGuardOut(g, guard)
+	positionsVisited, _ := moveGuardOut(g, *guard)
 	fmt.Println("6.1 - guard positions visited", positionsVisited)
 
-	loopPositions := findPositionsForLoopObstacle(g, guard)
+	loopPositions := findPositionsForLoopObstacle(g, *guard)
 	fmt.Println("6.2 - obstacles for looping a guard", loopPositions)
 }
