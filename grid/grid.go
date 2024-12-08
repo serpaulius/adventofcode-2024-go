@@ -103,7 +103,11 @@ func print2DArrayWithCoordinates(array [][]string) {
 	for col := 0; col < cols; col++ {
 		fmt.Printf("%3d ", col) // Row label
 		for row := 0; row < rows; row++ {
-			fmt.Printf("%v ", array[row][col])
+			toPrint := array[row][col]
+			if toPrint == "" {
+				toPrint = " "
+			}
+			fmt.Printf("%v ", toPrint)
 		}
 		fmt.Println()
 	}
