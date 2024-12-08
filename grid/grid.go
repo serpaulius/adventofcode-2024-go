@@ -1,5 +1,9 @@
 package grid
 
+import (
+	"fmt"
+)
+
 type Coordinate struct {
 	X int
 	Y int
@@ -7,6 +11,10 @@ type Coordinate struct {
 
 func (v1 Coordinate) Add(v2 Coordinate) Coordinate {
 	return Coordinate{v1.X + v2.X, v1.Y + v2.Y}
+}
+
+func (v1 Coordinate) Subtract(v2 Coordinate) Coordinate {
+	return Coordinate{v1.X - v2.X, v1.Y - v2.Y}
 }
 
 // x goes right, y goes bottom, listing vectors to corners from top-left clockwise:
@@ -20,6 +28,14 @@ var Vectors []Coordinate = append(SideVectors, CornerVectors...)
 type Grid struct {
 	values        [][]string
 	Width, Height int
+}
+
+func NewGrid(w int, h int) *Grid {
+	g := make([][]string, w)
+	for x := 0; x < w; x++ {
+		g[x] = make([]string, h)
+	}
+	return &Grid{values: g, Width: w, Height: h}
 }
 
 func GridFromLines(lines []string) *Grid {
@@ -64,4 +80,35 @@ func (g Grid) FindAll(letter string) []Coordinate {
 		}
 	}
 	return occurences
+}
+
+func print2DArrayWithCoordinates(array [][]string) {
+	// todo: generated, review and simplify
+	// Determine the size of the array
+	rows := len(array)
+	if rows == 0 {
+		fmt.Println("Empty array")
+		return
+	}
+	cols := len(array[0])
+
+	// Print column headers
+	fmt.Print("    ") // Offset for row labels
+	for col := 0; col < cols; col++ {
+		fmt.Printf("%v ", col)
+	}
+	fmt.Println()
+
+	// Print rows with coordinates
+	for col := 0; col < cols; col++ {
+		fmt.Printf("%3d ", col) // Row label
+		for row := 0; row < rows; row++ {
+			fmt.Printf("%v ", array[row][col])
+		}
+		fmt.Println()
+	}
+}
+
+func (g Grid) String() {
+	print2DArrayWithCoordinates(g.values)
 }

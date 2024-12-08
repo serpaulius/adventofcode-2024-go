@@ -25,5 +25,6 @@ go.work.sum
 .env
 
 .DS_Store
+cpu.prof
 
 go-tour

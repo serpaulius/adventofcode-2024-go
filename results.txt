@@ -12,3 +12,4 @@
 6.2 - obstacles for looping a guard 1951
 7.1 - 2 operators on the bridge 3119088655389
 7.2 - 3 operators on the bridge 264184041398847
+8.1 - antinodes for antennas in line 351
