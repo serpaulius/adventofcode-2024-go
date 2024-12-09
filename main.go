@@ -9,6 +9,7 @@ import (
 	sixth "adventofcode/2024-go/6"
 	seventh "adventofcode/2024-go/7"
 	eighth "adventofcode/2024-go/8"
+	ninth "adventofcode/2024-go/9"
 	"fmt"
 	"io"
 	"log"
@@ -44,4 +45,5 @@ func main() {
 	sixth.Run()
 	seventh.Run()
 	eighth.Run()
+	ninth.Run()
 }

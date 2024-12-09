@@ -14,3 +14,4 @@
 7.2 - 3 operators on the bridge 264184041398847
 8.1 - antinodes for antennas in line 351
 8.2 - antinodes with antennas till end 1259
+9.1 - disk fragmenter 6283170117911
