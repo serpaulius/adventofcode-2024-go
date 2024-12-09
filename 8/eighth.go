@@ -6,28 +6,63 @@ import (
 	"fmt"
 )
 
-func calcNodes(antenna grid.Coordinate, previousAntennas []grid.Coordinate, antinodes *grid.Grid) int64 {
-	printedNew := 0
-	for _, previousAntenna := range previousAntennas {
-		antinode1 := previousAntenna.Add(previousAntenna.Subtract(antenna))
-		antinode2 := antenna.Add(antenna.Subtract(previousAntenna))
-		if antinodes.IsValidCoord(antinode1) && antinodes.GetLetterByCoordinate(antinode1) != "#" {
-			antinodes.SetLetterByCoordinate(antinode1, "#")
-			printedNew++
-		}
-		if antinodes.IsValidCoord(antinode2) && antinodes.GetLetterByCoordinate(antinode2) != "#" {
-			antinodes.SetLetterByCoordinate(antinode2, "#")
-			printedNew++
-		}
+var oncePerDirection = true
+var includeAllAntennas = false
+
+func tryAddingNewAntinode(where grid.Coordinate, antinodes *grid.Grid) int {
+	if antinodes.GetLetterByCoordinate(where) != "#" {
+		antinodes.SetLetterByCoordinate(where, "#")
+		return 1
 	}
-	return int64(printedNew)
+	return 0
 }
 
-func parseInput(g *grid.Grid) int64 {
+func addAntinodesInDirection(antenna grid.Coordinate, direction grid.Coordinate, antinodes *grid.Grid) int {
+	currPosition := antenna.Add(direction)
+	var sumAdded = 0
+	for antinodes.IsValidCoord(currPosition) {
+		sumAdded += tryAddingNewAntinode(currPosition, antinodes)
+		currPosition = currPosition.Add(direction)
+		if oncePerDirection {
+			break
+		}
+	}
+	return sumAdded
+}
+
+// greatest common divider
+func gcd(a, b int) int {
+	for b != 0 {
+		a, b = b, a%b
+	}
+	return a
+}
+
+func calcNodes(antenna grid.Coordinate, previousAntennas []grid.Coordinate, antinodes *grid.Grid) int {
+	newAntinodesAdded := 0
+	for _, previousAntenna := range previousAntennas {
+		vector1 := previousAntenna.Subtract(antenna)
+		vector2 := antenna.Subtract(previousAntenna)
+		if includeAllAntennas {
+			// find shortest natural number vector for going through every coordinate on the way including in between antennas
+			vectorGcd := gcd(vector1.X, vector1.Y)
+			vector1 = grid.Coordinate{X: vector1.X / vectorGcd, Y: vector1.Y / vectorGcd}
+			vector2 = grid.Coordinate{X: vector2.X / vectorGcd, Y: vector2.Y / vectorGcd}
+
+		}
+		newAntinodesAdded += addAntinodesInDirection(previousAntenna, vector1, antinodes)
+		newAntinodesAdded += addAntinodesInDirection(antenna, vector2, antinodes)
+
+		// antinodes.String()
+	}
+	return newAntinodesAdded
+}
+
+func parseInput(g *grid.Grid) int {
 	var antennaMap = map[string][]grid.Coordinate{}
 	var coordinate = grid.Coordinate{}
 	var antinodes = grid.NewGrid(g.Width, g.Height)
-	var antiCount int64
+	var antiCount int
 
 	for x := 0; x < g.Width; x++ {
 		for y := 0; y < g.Height; y++ {
@@ -54,4 +89,11 @@ func Run() {
 	g := grid.GridFromLines(lines)
 	antinodeCount := parseInput(g)
 	fmt.Println("8.1 - antinodes for antennas in line", antinodeCount)
+
+	// fixme: not nice
+	oncePerDirection = false
+	includeAllAntennas = true
+	antinodeCount2 := parseInput(g)
+	fmt.Println("8.2 - antinodes with antennas till end", antinodeCount2)
+	// uniqueLocationsInBounds()
 }

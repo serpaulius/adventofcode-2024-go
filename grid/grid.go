@@ -105,9 +105,9 @@ func print2DArrayWithCoordinates(array [][]string) {
 		for row := 0; row < rows; row++ {
 			toPrint := array[row][col]
 			if toPrint == "" {
-				toPrint = " "
+				toPrint = "."
 			}
-			fmt.Printf("%v ", toPrint)
+			fmt.Printf("%v", toPrint)
 		}
 		fmt.Println()
 	}
