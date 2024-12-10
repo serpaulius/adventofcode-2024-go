@@ -17,6 +17,16 @@ func (v1 Coordinate) Subtract(v2 Coordinate) Coordinate {
 	return Coordinate{v1.X - v2.X, v1.Y - v2.Y}
 }
 
+func (c Coordinate) NextSideVector() Coordinate {
+	for i, side := range SideVectors {
+		if c == side {
+			nextIndex := (i + 1) % 4
+			return SideVectors[nextIndex]
+		}
+	}
+	panic("no side matched, check vector")
+}
+
 // x goes right, y goes bottom, listing vectors to corners from top-left clockwise:
 var CornerVectors = []Coordinate{{-1, -1}, {1, -1}, {1, 1}, {-1, 1}}
 

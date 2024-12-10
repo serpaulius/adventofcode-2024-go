@@ -19,16 +19,6 @@ func findGuard(g *grid.Grid) *Guard {
 	return &Guard{position: guardPosition[0], direction: grid.SideVectors[0]}
 }
 
-func rotateVectorClockwise(c grid.Coordinate) grid.Coordinate {
-	for i, side := range grid.SideVectors {
-		if c == side {
-			nextIndex := (i + 1) % 4
-			return grid.SideVectors[nextIndex]
-		}
-	}
-	panic("no side matched, check vector")
-}
-
 type arr2d [][]int64
 
 var visitedCoordinates arr2d
@@ -58,7 +48,7 @@ func moveGuardOut(g *grid.Grid, guard Guard) (int, bool) {
 		isObstruction := g.GetLetterByCoordinate(nextStep) == "#"
 		if isObstruction {
 			obstaclesHit[nextStep.X][nextStep.Y]++
-			guard.direction = rotateVectorClockwise(guard.direction)
+			guard.direction = guard.direction.NextSideVector()
 		}
 		if !isObstruction {
 			guard.position = nextStep

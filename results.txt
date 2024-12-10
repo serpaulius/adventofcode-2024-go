@@ -16,3 +16,4 @@
 8.2 - antinodes with antennas till end 1259
 9.1 - disk fragmenter 6283170117911
 9.2 - disk defragmenter 6307653242596
+10.1 - traverse trails 822
