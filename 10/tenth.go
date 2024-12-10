@@ -8,10 +8,15 @@ import (
 )
 
 func traverseTrails(g *grid.Grid, coordinate grid.Coordinate, currValue int64, visited *grid.Grid) int64 {
-	if currValue == 9 && visited.GetLetterByCoordinate(coordinate) != "X" {
-		visited.SetLetterByCoordinate(coordinate, "X")
-		return 1
+	if currValue == 9 {
+		if visited == nil {
+			return 1
+		} else if visited.GetLetterByCoordinate(coordinate) != "X" {
+			visited.SetLetterByCoordinate(coordinate, "X")
+			return 1
+		}
 	}
+
 	var peaksFound int64
 	for _, vector := range grid.SideVectors {
 		nextCoordinate := coordinate.Add(vector)
@@ -27,14 +32,23 @@ func traverseTrails(g *grid.Grid, coordinate grid.Coordinate, currValue int64, v
 
 func parseData(g *grid.Grid) int64 {
 	zeros := g.FindAll("0")
-	var allTrails int64
+	var visitedPeaksPerTrailhead int64
 	for _, zero := range zeros {
 		visitedCoords := grid.NewGrid(g.Width, g.Height)
 		visited := traverseTrails(g, zero, 0, visitedCoords)
-		allTrails += visited
+		visitedPeaksPerTrailhead += visited
 	}
+	return visitedPeaksPerTrailhead
+}
 
-	return allTrails
+func trailsPossiblePerPeak(g *grid.Grid) int64 {
+	zeros := g.FindAll("0")
+	var trailsPerPeak int64
+	for _, zero := range zeros {
+		visited := traverseTrails(g, zero, 0, nil)
+		trailsPerPeak += visited
+	}
+	return trailsPerPeak
 }
 
 //take a map
@@ -56,7 +70,9 @@ func Run() {
 	lines := util.ReadLines(scanner)
 
 	g := grid.GridFromLines(lines)
-	checksum := parseData(g)
-	fmt.Println("10.1 - traverse trails", checksum)
+	result1 := parseData(g)
+	fmt.Println("10.1 - peaks per trail", result1)
+	result2 := trailsPossiblePerPeak(g)
+	fmt.Println("10.2 - trails per peak", result2)
 
 }
