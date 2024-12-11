@@ -3,6 +3,7 @@ package main
 import (
 	first "adventofcode/2024-go/1"
 	tenth "adventofcode/2024-go/10"
+	eleventh "adventofcode/2024-go/11"
 	second "adventofcode/2024-go/2"
 	third "adventofcode/2024-go/3"
 	fourth "adventofcode/2024-go/4"
@@ -48,4 +49,5 @@ func main() {
 	eighth.Run()
 	ninth.Run()
 	tenth.Run()
+	eleventh.Run()
 }

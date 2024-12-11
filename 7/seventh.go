@@ -30,30 +30,6 @@ func parseInput(lines []string) []Equation {
 	return equations
 }
 
-func intLength(i int64) int64 {
-	if i == 0 {
-		return 1
-	}
-	var count int64
-	for i != 0 {
-		i /= 10
-		count++
-	}
-	return count
-}
-
-func addZeros(value int64, zeros int64) int64 {
-	var i int64
-	for i = 0; i < zeros; i++ {
-		value = value * 10
-	}
-	return value
-}
-
-func concatInts(a int64, b int64) int64 {
-	return addZeros(a, intLength(b)) + b
-}
-
 var concatEnabled = false
 
 func traverseEquation(equation Equation, result int64, operandIndex int) bool {
@@ -83,7 +59,7 @@ func traverseEquation(equation Equation, result int64, operandIndex int) bool {
 	}
 
 	if concatEnabled {
-		return traverseEquation(equation, concatInts(result, operand), operandIndex+1)
+		return traverseEquation(equation, util.ConcatInts(result, operand), operandIndex+1)
 	}
 
 	return false

@@ -18,3 +18,4 @@
 9.2 - disk defragmenter 6307653242596
 10.1 - peaks per trail 822
 10.2 - trails per peak 1801
+11.1 - stones 197357
