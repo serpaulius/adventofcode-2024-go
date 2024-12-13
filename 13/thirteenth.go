@@ -67,6 +67,14 @@ func Run() {
 	for _, machine := range machines {
 		sum += cheapify(machine)
 	}
-
 	fmt.Println("13.2 buttons to press", sum)
+
+	var sum2 int64
+	for _, machine := range machines {
+		machine.prize.X += 10000000000000
+		machine.prize.Y += 10000000000000
+		sum2 += cheapify(machine)
+	}
+
+	fmt.Println("13.2 buttons to press if +10000000000000", sum2)
 }
