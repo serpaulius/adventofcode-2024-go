@@ -3,37 +3,68 @@ package twelfth
 import (
 	"adventofcode/2024-go/grid"
 	"adventofcode/2024-go/util"
+	"fmt"
 	"log"
 )
 
-/*
-......
-.AAAA.
-.BBCD.
-.BBCC.
-.EEEC.
-......
-everywhere where A touches something, is a perimeter part
-so there are 4 A's with every A touching .'s and B's anc, etc
+type Region struct {
+	letter    string
+	curr      grid.Coordinate
+	perimeter int64
+	area      int64
+}
 
-fixme: I will need to go around all regions, unfortunately
-*/
-var touchesPerLetter = make(map[string]int64)
-var letters = make(map[string]int64)
+var regions []Region = make([]Region, 0)
 
-func traverseLetters(g *grid.Grid) {
-	for x := 0; x < g.Width; x++ {
-		for y := 0; y < g.Height; y++ {
+// var regions = map[grid.Coordinate][]grid.Coordinate
+// take a grid
+// visit a cell
+// check sides
+//   visit a cell
+//   check sides
+//     repeat while nowhere to go
+
+func flood(region *Region, g *grid.Grid, visited *grid.Grid) {
+	curr := region.curr
+	visited.SetLetterByCoordinate(region.curr, "X")
+	region.area++
+	for _, side := range grid.SideVectors {
+		candidate := curr.Add(side)
+		// is candidate out of bounds?
+		isValid := g.IsValidCoord(candidate)
+		if !isValid {
+			region.perimeter++
+			continue
+		}
+
+		candidateLetter := g.GetLetterByCoordinate(candidate)
+		// is candidate end of region?
+		if candidateLetter != region.letter {
+			region.perimeter++
+			continue
+		}
+		isVisited := visited.GetLetterByCoordinate(candidate) != ""
+		// is candidate visited?
+		if isVisited {
+			continue
+		}
+		// is candidate same letter?
+		if candidateLetter == region.letter {
+			region.curr = candidate
+			flood(region, g, visited)
+		}
+	}
+}
+
+func traverseLetters(g *grid.Grid, visited *grid.Grid) {
+	for y := 0; y < g.Height; y++ {
+		for x := 0; x < g.Width; x++ {
 			currCoord := grid.Coordinate{X: x, Y: y}
-			currLetter := g.GetLetterByCoordinate(currCoord)
-			letters[currLetter]++
-			for _, v := range grid.SideVectors {
-				toCheck := currCoord.Add(v)
-				isValid := g.IsValidCoord(toCheck)
-				if isValid && g.GetLetterByCoordinate(toCheck) != currLetter || !isValid {
-					// this is perimieter, mate
-					touchesPerLetter[currLetter]++
-				}
+			if visited.GetLetterByCoordinate(currCoord) == "" {
+				region := Region{letter: g.GetLetterByCoordinate(currCoord), curr: currCoord}
+				flood(&region, g, visited)
+				log.Println("one done", region)
+				regions = append(regions, region)
 			}
 		}
 	}
@@ -46,14 +77,12 @@ func Run() {
 	input := util.ReadLines(scanner)
 
 	g := grid.GridFromLines(input)
-	traverseLetters(g)
-	log.Println(letters)
-	log.Println(touchesPerLetter)
+	visited := grid.NewGrid(g.Width, g.Height)
+	traverseLetters(g, visited)
 	var sum int64
-	for letter, count := range letters {
-		sum += count * touchesPerLetter[letter]
+	for _, region := range regions {
+		log.Println(region.area, region.perimeter, region.area*region.perimeter)
+		sum += region.area * region.perimeter
 	}
-	// fixme:
-	//fmt.Println("12.1 perimeters", sum)
-
+	fmt.Println("12.1 price of regions", sum)
 }

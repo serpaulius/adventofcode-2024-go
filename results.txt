@@ -20,6 +20,7 @@
 10.2 - trails per peak 1801
 11.1 - blink25 197357
 11.2 - blink75 234568186890978
+12.1 price of regions 1396562
 13.1 buttons to press 36838
 13.2 buttons to press if +10000000000000 83029436920891
 14.1 robots 211692000
