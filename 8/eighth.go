@@ -30,14 +30,6 @@ func addAntinodesInDirection(antenna grid.Coordinate, direction grid.Coordinate,
 	return sumAdded
 }
 
-// greatest common divider
-func gcd(a, b int) int {
-	for b != 0 {
-		a, b = b, a%b
-	}
-	return a
-}
-
 func calcNodes(antenna grid.Coordinate, previousAntennas []grid.Coordinate, antinodes *grid.Grid) int {
 	newAntinodesAdded := 0
 	for _, previousAntenna := range previousAntennas {
@@ -45,7 +37,7 @@ func calcNodes(antenna grid.Coordinate, previousAntennas []grid.Coordinate, anti
 		vector2 := antenna.Subtract(previousAntenna)
 		if includeAllAntennas {
 			// find shortest natural number vector for going through every coordinate on the way including in between antennas
-			vectorGcd := gcd(vector1.X, vector1.Y)
+			vectorGcd := util.Gcd(vector1.X, vector1.Y)
 			vector1 = grid.Coordinate{X: vector1.X / vectorGcd, Y: vector1.Y / vectorGcd}
 			vector2 = grid.Coordinate{X: vector2.X / vectorGcd, Y: vector2.Y / vectorGcd}
 
