@@ -6,19 +6,12 @@ import (
 	"fmt"
 	"log"
 	"regexp"
-	"strconv"
 )
 
 type Machine struct {
 	a     grid.Coordinate
 	b     grid.Coordinate
 	prize grid.Coordinate
-}
-
-func justMakeCoord(str []string) grid.Coordinate {
-	x, _ := strconv.ParseInt(str[0], 10, 64)
-	y, _ := strconv.ParseInt(str[1], 10, 64)
-	return grid.Coordinate{X: int(x), Y: int(y)}
 }
 
 func parseInput(lines []string) []Machine {
@@ -30,7 +23,7 @@ func parseInput(lines []string) []Machine {
 		a := coordFinder.FindAllString(lines[currIndex], 2)
 		b := coordFinder.FindAllString(lines[currIndex+1], 2)
 		prize := coordFinder.FindAllString(lines[currIndex+2], 2)
-		machine := Machine{a: justMakeCoord(a), b: justMakeCoord(b), prize: justMakeCoord(prize)}
+		machine := Machine{a: grid.CoordinateFromArray(a), b: grid.CoordinateFromArray(b), prize: grid.CoordinateFromArray(prize)}
 		machines = append(machines, machine)
 	}
 	return machines
@@ -67,7 +60,7 @@ func Run() {
 	for _, machine := range machines {
 		sum += cheapify(machine)
 	}
-	fmt.Println("13.2 buttons to press", sum)
+	fmt.Println("13.1 buttons to press", sum)
 
 	var sum2 int64
 	for _, machine := range machines {

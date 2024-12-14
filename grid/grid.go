@@ -2,6 +2,7 @@ package grid
 
 import (
 	"fmt"
+	"strconv"
 )
 
 type Coordinate struct {
@@ -25,6 +26,12 @@ func (c Coordinate) NextSideVector() Coordinate {
 		}
 	}
 	panic("no side matched, check vector")
+}
+
+func CoordinateFromArray(str []string) Coordinate {
+	x, _ := strconv.ParseInt(str[0], 10, 64)
+	y, _ := strconv.ParseInt(str[1], 10, 64)
+	return Coordinate{X: int(x), Y: int(y)}
 }
 
 // x goes right, y goes bottom, listing vectors to corners from top-left clockwise:
@@ -79,6 +86,27 @@ func (g Grid) IsValidCoord(c Coordinate) bool {
 	return c.X >= 0 && c.Y >= 0 && c.X < g.Width && c.Y < g.Height
 }
 
+func (g Grid) WrapAroundEdge(c Coordinate) Coordinate {
+	if !g.IsValidCoord(c) {
+		var maxX int = g.Width
+		var maxY int = g.Height
+		// say result is 8,8 on 7,7 grid
+		// 8-7=1; 8-7=1 = 1,1
+		// say result is -8,16 on 7,7 grid ()
+		// -8+7*(1+1)=6; 16-7*2=4
+		modX := c.X % maxX
+		modY := c.Y % maxY
+		if modX < 0 {
+			modX += maxX
+		}
+		if modY < 0 {
+			modY += maxY
+		}
+		return Coordinate{modX, modY}
+	}
+	return c
+}
+
 func (g Grid) FindAll(letter string) []Coordinate {
 	var occurences []Coordinate
 	c := Coordinate{}
@@ -95,25 +123,25 @@ func (g Grid) FindAll(letter string) []Coordinate {
 func print2DArrayWithCoordinates(array [][]string) {
 	// todo: generated, review and simplify
 	// Determine the size of the array
-	rows := len(array)
-	if rows == 0 {
+	width := len(array)
+	if width == 0 {
 		fmt.Println("Empty array")
 		return
 	}
-	cols := len(array[0])
+	height := len(array[0])
 
 	// Print column headers
 	fmt.Print("    ") // Offset for row labels
-	for col := 0; col < cols; col++ {
-		fmt.Printf("%v ", col)
+	for x := 0; x < width; x++ {
+		fmt.Printf("%v", x)
 	}
 	fmt.Println()
 
 	// Print rows with coordinates
-	for col := 0; col < cols; col++ {
-		fmt.Printf("%3d ", col) // Row label
-		for row := 0; row < rows; row++ {
-			toPrint := array[row][col]
+	for y := 0; y < height; y++ {
+		fmt.Printf("%3d ", y) // Row label
+		for x := 0; x < width; x++ {
+			toPrint := array[x][y]
 			if toPrint == "" {
 				toPrint = "."
 			}
