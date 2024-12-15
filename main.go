@@ -7,6 +7,7 @@ import (
 	twelfth "adventofcode/2024-go/12"
 	thirteenth "adventofcode/2024-go/13"
 	fourteenth "adventofcode/2024-go/14"
+	fifteenth "adventofcode/2024-go/15"
 	second "adventofcode/2024-go/2"
 	third "adventofcode/2024-go/3"
 	fourth "adventofcode/2024-go/4"
@@ -56,4 +57,5 @@ func main() {
 	twelfth.Run()
 	thirteenth.Run()
 	fourteenth.Run()
+	fifteenth.Run()
 }

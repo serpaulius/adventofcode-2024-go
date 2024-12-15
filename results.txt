@@ -25,3 +25,4 @@
 13.2 buttons to press if +10000000000000 83029436920891
 14.1 robots 211692000
 14.2 img index 6586
+15.1 sum of GPS coords 1492518
