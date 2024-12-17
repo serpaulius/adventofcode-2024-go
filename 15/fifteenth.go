@@ -131,6 +131,7 @@ func (w *World) moveRobot(directionStr string) bool {
 	return false
 }
 
+// fixme: make it more "polymorphic"
 func (w *World) moveObject(direction grid.Coordinate, o MapObject) bool {
 	if o != nil {
 		destination := o.position().Add(direction)
@@ -146,6 +147,7 @@ func (w *World) moveObject(direction grid.Coordinate, o MapObject) bool {
 				neighbor = w.getObj(destination)
 			}
 			if neighbor == nil {
+				// fixme: repeated a few times
 				w.objects[object.p.X][object.p.Y] = nil
 				object.p = destination
 				w.objects[object.p.X][object.p.Y] = object
