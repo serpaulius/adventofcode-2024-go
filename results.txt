@@ -28,3 +28,4 @@
 15.1 sum of GPS coords 1492518
 16.1 price for reaching the end 94436
 17.1 out 1,4,6,1,6,4,3,0,3
+18.1 labyrinth again 316
