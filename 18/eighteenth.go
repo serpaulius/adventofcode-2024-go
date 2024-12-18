@@ -9,16 +9,21 @@ import (
 	"strings"
 )
 
-func preParseData(input []string) *grid.Grid {
+func parseAndAddCorruption(line string, g *grid.Grid) {
+	str := strings.Split(line, ",")
+	x, _ := strconv.ParseInt(str[0], 10, 64)
+	y, _ := strconv.ParseInt(str[1], 10, 64)
+	g.SetLetterByCoordinate(grid.Coordinate{X: int(x), Y: int(y)}, "#")
+
+}
+
+func preParseData(input []string, amount int) *grid.Grid {
 	g := grid.NewGrid(71, 71)
 	simulated := 0
 	for _, str := range input {
-		str := strings.Split(str, ",")
-		x, _ := strconv.ParseInt(str[0], 10, 64)
-		y, _ := strconv.ParseInt(str[1], 10, 64)
-		g.SetLetterByCoordinate(grid.Coordinate{X: int(x), Y: int(y)}, "#")
+		parseAndAddCorruption(str, g)
 		simulated++
-		if simulated == 1024 {
+		if simulated == amount {
 			break
 		}
 	}
@@ -33,8 +38,26 @@ func Run() {
 	defer util.CloseFileOrPanicPlz(file)
 	scanner := util.GiveMeAScannerPlz(file)
 	input := util.ReadLines(scanner)
-	g := preParseData(input)
-	res := labyrinth.FindLowestScorePath(g, labyrinth.LabyrinthOptions{ScoreForCorner: 1, ScoreForSameDirection: 1})
+
+	amount := 1024
+	g := preParseData(input, amount)
+
+	opt := labyrinth.LabyrinthOptions{ScoreForCorner: 1, ScoreForSameDirection: 1}
+	res := labyrinth.FindLowestScorePath(g, opt)
 
 	fmt.Println("18.1 labyrinth again", res)
+
+	firstToCorrupt := ""
+	for i := amount + 1; i < len(input); i++ {
+		parseAndAddCorruption(input[i], g)
+		res := labyrinth.FindLowestScorePath(g, opt)
+
+		// stop if not reachable (approx. more steps needed than coordinates exist)
+		if res > 71*71 {
+			firstToCorrupt = input[i]
+			break
+		}
+	}
+
+	fmt.Println("18.2 first to corrupt", firstToCorrupt)
 }
