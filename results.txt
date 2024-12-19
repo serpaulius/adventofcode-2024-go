@@ -30,3 +30,4 @@
 17.1 out 1,4,6,1,6,4,3,0,3
 18.1 labyrinth again 316
 18.2 first to corrupt 45,18
+19.1 327
