@@ -20,27 +20,30 @@ func parseInput(lines []string) ([]string, []string) {
 	return towelTypes, expectedTowels
 }
 
-func isPossible(target string, words []string) bool {
+func isPossible(target string, words []string) int {
 	targetLength := len(target)
-	canBeConstructed := make([]bool, targetLength+1)
+	canBeConstructed := make([]int, targetLength+1)
 	// one can construct a 0-sized word
-	canBeConstructed[0] = true
+	canBeConstructed[0] = 1
+
 	// for every letter check every word if it can be constructed from current letter
 	for i := range targetLength {
-		if canBeConstructed[i] {
-			for _, word := range words {
-				// skip too long words
-				if i+len(word) > len(target) {
+		if canBeConstructed[i] > 0 {
+			for _, candidate := range words {
+				// skip too long words from this position
+				if i+len(candidate) > len(target) {
 					continue
 				}
 				// check if candidate word is in the string
-				if target[i:i+len(word)] == word {
-					// if yes, then it can be constructed
-					canBeConstructed[i+len(word)] = true
+				if target[i:i+len(candidate)] == candidate {
+					// if yes, then it can be constructed at it's end index
+					// ... and there will be exactly current amount of existing combos added to that index
+					canBeConstructed[i+len(candidate)] += canBeConstructed[i]
 				}
 			}
 		}
 	}
+
 	return canBeConstructed[targetLength]
 }
 
@@ -53,13 +56,15 @@ func Run() {
 	towelTypes, expectations := parseInput(input)
 
 	res := 0
+	res2 := 0
 	for _, ex := range expectations {
 		possible := isPossible(ex, towelTypes)
-		// fmt.Println(ex, possible)
-		if possible {
+		if possible > 0 {
 			res += 1
+			res2 += possible
 		}
 	}
 
 	fmt.Println("19.1", res)
+	fmt.Println("19.2", res2)
 }
